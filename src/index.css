@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 220 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+
+    --primary: 215 90% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 30% 94%;
+    --secondary-foreground: 215 50% 30%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 50%;
+
+    --accent: 160 60% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 20% 90%;
+    --input: 214 20% 90%;
+    --ring: 215 90% 50%;
+
+    --radius: 0.75rem;
+
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 220 25% 8%;
+    --foreground: 210 20% 96%;
+    --card: 220 20% 12%;
+    --card-foreground: 210 20% 96%;
+    --popover: 220 20% 12%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 215 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 20% 18%;
+    --secondary-foreground: 210 20% 90%;
+    --muted: 215 15% 16%;
+    --muted-foreground: 215 15% 60%;
+    --accent: 160 60% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 15% 20%;
+    --input: 215 15% 20%;
+    --ring: 215 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .heading-clamp {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    line-height: 1.2;
+  }
+  .subheading-clamp {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    line-height: 1.5;
+  }
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .safe-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+}
