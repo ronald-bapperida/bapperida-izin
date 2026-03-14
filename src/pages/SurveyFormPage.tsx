@@ -33,7 +33,7 @@ export default function SurveyFormPage() {
     // Translation maps for survey fields
     const fieldLabelMap: Record<string, string> = {
       email: 'survey.field.email',
-      name: 'survey.field.name',
+      respondent_name: 'survey.field.respondent_name',
       age: 'survey.field.age',
       gender: 'survey.field.gender',
       education: 'survey.field.education',

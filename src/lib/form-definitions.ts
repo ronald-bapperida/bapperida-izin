@@ -151,7 +151,7 @@ export const surveySections: FormSection[] = [
     title: 'Data Responden',
     fields: [
       { name: 'email', label: 'Email', type: 'email', required: true },
-      { name: 'name', label: 'Nama', type: 'text', required: true },
+      { name: 'respondent_name', label: 'Nama', type: 'text', required: true },
       { name: 'age', label: 'Usia', type: 'number', required: true, min: 10, max: 100, placeholder: '25' },
       {
         name: 'gender', label: 'Jenis Kelamin', type: 'radio', required: true,
@@ -224,3 +224,15 @@ export const finalReportSections: FormSection[] = [
     ],
   },
 ];
+
+export const permitStatusValues = [
+  "submitted",
+  "in_review",
+  "revision_requested",
+  "approved",
+  "generated_letter",
+  "sent",
+  "rejected",
+] as const;
+
+export type PermitStatus = typeof permitStatusValues[number];

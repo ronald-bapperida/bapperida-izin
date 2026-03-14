@@ -91,11 +91,35 @@ export async function submitPermit(values: Record<string, unknown>): Promise<Sub
 }
 
 // ─── Submit: Survey ──────────────────────────────────────────────────────────
+const SURVEY_FIELD_MAP: Record<string, string> = {
+  email: "email",
+  respondent_name: "respondentName", // mapping ke camelCase database
+  age: "age",
+  gender: "gender",
+  education: "education",
+  occupation: "occupation",
+  q1_requirement: "q1",
+  q2_procedure: "q2",
+  q3_speed: "q3",
+  q4_cost: "q4",
+  q5_product: "q5",
+  q6_competence: "q6",
+  q7_courtesy: "q7",
+  q8_facility: "q8",
+  q9_complaint: "q9",
+  suggestion: "suggestion",
+};
 
 export async function submitSurvey(values: Record<string, unknown>): Promise<SubmitResponse> {
   if (USE_MOCK) return mockSubmitSurvey(values);
 
-  const { data } = await api.post("/api/surveys", values);
+  const mappedValues: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(values)) {
+    const apiKey = SURVEY_FIELD_MAP[key] || key;
+    mappedValues[apiKey] = value;
+  }
+
+  const { data } = await api.post("/api/surveys", mappedValues);
   return {
     success: true,
     message: data.message || "Terima kasih, survei terkirim",

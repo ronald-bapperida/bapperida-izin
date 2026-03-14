@@ -1,3 +1,5 @@
+import { PermitStatus } from "@/lib/form-definitions";
+
 export interface FormField {
   name: string;
   label: string;
@@ -37,4 +39,5 @@ export interface SubmitResponse {
   success: boolean;
   message: string;
   requestNumber?: string;
+  status?: PermitStatus;
 }

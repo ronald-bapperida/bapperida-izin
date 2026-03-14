@@ -86,7 +86,7 @@ const translations = {
 
   // Survey fields
   'survey.field.email': { id: 'Email', en: 'Email' },
-  'survey.field.name': { id: 'Nama', en: 'Name' },
+  'survey.field.respondent_name': { id: 'Nama', en: 'Name' },
   'survey.field.age': { id: 'Usia', en: 'Age' },
   'survey.field.gender': { id: 'Jenis Kelamin', en: 'Gender' },
   'survey.field.gender.male': { id: 'Laki-laki', en: 'Male' },

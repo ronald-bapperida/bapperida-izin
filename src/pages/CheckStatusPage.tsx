@@ -1,15 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/AppShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useI18n } from '@/lib/i18n';
 import { checkPermitStatus } from '@/lib/api';
-import { Search, Loader2, FileDown, AlertTriangle, CheckCircle2, Clock, XCircle, FileText } from 'lucide-react';
+import { Search, Loader2, FileDown, AlertTriangle, CheckCircle2, Clock, XCircle, FileText, Edit, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface PermitResult {
   id: string;
   requestNumber: string;
+  email: string;
   fullName?: string;
   researchTitle?: string;
   status: string;
@@ -21,6 +23,7 @@ interface PermitResult {
 }
 
 export default function CheckStatusPage() {
+  const navigate = useNavigate();
   const { t } = useI18n();
   const { toast } = useToast();
   const [requestNumber, setRequestNumber] = useState('');
@@ -57,7 +60,50 @@ export default function CheckStatusPage() {
     }
   };
 
+  const handleAction = () => {
+    if (!result) return;
+
+    switch (result.status) {
+      case 'submitted':
+        // Isi survei kepuasan
+        navigate('/survei-kepuasan', { 
+          state: { 
+            requestNumber: result.requestNumber,
+            email: result.email,
+            name: result.fullName 
+          } 
+        });
+        break;
+      case 'approved':
+        // Upload laporan akhir
+        navigate('/laporan-akhir', { 
+          state: { 
+            requestNumber: result.requestNumber,
+            email: result.email,
+            name: result.fullName,
+            researchTitle: result.researchTitle
+          } 
+        });
+        break;
+      case 'revision_requested':
+        // Revisi permohonan
+        navigate('/izin-penelitian/revisi', { 
+          state: { 
+            requestNumber: result.requestNumber,
+            reviewNote: result.review_note || result.reviewNote
+          } 
+        });
+        break;
+      default:
+        // Tidak ada action
+        break;
+    }
+  };
+
   const status = result?.status?.toLowerCase() || '';
+  const isSubmitted = status === 'submitted';
+  const isApproved = status === 'approved';
+  const isRevisionRequested = status === 'revision_requested';
   const isSentOrGenerated = status === 'sent' || status === 'generated_letter';
   const isRejected = status === 'rejected';
   const reviewNote = result?.review_note || result?.reviewNote || '';
@@ -65,12 +111,60 @@ export default function CheckStatusPage() {
   const getStatusConfig = () => {
     if (isSentOrGenerated) return { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', label: t('status.sent') };
     if (isRejected) return { icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/5', label: t('status.rejected') };
+    if (isApproved) return { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', label: 'Disetujui' };
+    if (isRevisionRequested) return { icon: AlertTriangle, color: 'text-yellow-600', bg: 'bg-yellow-50', label: 'Perlu Revisi' };
+    if (isSubmitted) return { icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', label: 'Submitted' };
     return { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', label: t('status.processing') };
   };
 
   const statusConfig = result ? getStatusConfig() : null;
 
   const fileUrl = result?.generatedLetter?.fileUrl || result?.fileUrl;
+
+  const getActionButton = () => {
+    if (!result) return null;
+
+    if (isSubmitted) {
+      return (
+        <Button 
+          onClick={handleAction} 
+          className="w-full tap-target gap-2"
+          size="lg"
+        >
+          <Edit className="w-5 h-5" />
+          Isi Survei Kepuasan
+        </Button>
+      );
+    }
+
+    if (isApproved) {
+      return (
+        <Button 
+          onClick={handleAction} 
+          className="w-full tap-target gap-2"
+          size="lg"
+        >
+          <Send className="w-5 h-5" />
+          Upload Laporan Akhir
+        </Button>
+      );
+    }
+
+    if (isRevisionRequested) {
+      return (
+        <Button 
+          onClick={handleAction} 
+          className="w-full tap-target gap-2"
+          size="lg"
+        >
+          <Edit className="w-5 h-5" />
+          Revisi Permohonan
+        </Button>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <AppShell title={t('status.appShellTitle')}>
@@ -141,6 +235,14 @@ export default function CheckStatusPage() {
                 </div>
               )}
 
+              {/* Revision requested: show review note */}
+              {isRevisionRequested && reviewNote && (
+                <div className="rounded-lg border border-yellow-600/20 bg-yellow-50 p-3 space-y-1">
+                  <p className="text-xs font-semibold text-yellow-600">Catatan Revisi:</p>
+                  <p className="text-sm text-foreground">{reviewNote}</p>
+                </div>
+              )}
+
               {/* Sent/Generated: show download + office notice */}
               {isSentOrGenerated && (
                 <div className="space-y-3 pt-1">
@@ -165,6 +267,9 @@ export default function CheckStatusPage() {
                   </div>
                 </div>
               )}
+
+              {/* Action button */}
+              {getActionButton()}
             </div>
           </div>
         )}
