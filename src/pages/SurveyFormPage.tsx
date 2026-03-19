@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AppShell } from '@/components/AppShell';
@@ -18,8 +18,16 @@ import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/lib/i18n';
 import type { FormSection } from '@/types/form';
 
+interface SurveyNavState {
+  requestNumber?: string;
+  email?: string;
+  name?: string;
+}
+
 export default function SurveyFormPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = (location.state as SurveyNavState) || {};
   const { toast } = useToast();
   const { t, lang } = useI18n();
   const [step, setStep] = useState(0);
@@ -29,8 +37,7 @@ export default function SurveyFormPage() {
   // Build translated sections
   const sections: FormSection[] = useMemo(() => {
     const sectionKeys = ['survey.section.respondent', 'survey.section.rating', 'survey.section.suggestion'] as const;
-    
-    // Translation maps for survey fields
+
     const fieldLabelMap: Record<string, string> = {
       email: 'survey.field.email',
       respondent_name: 'survey.field.respondent_name',
@@ -57,11 +64,11 @@ export default function SurveyFormPage() {
       title: t(sectionKeys[i] as any),
       fields: sec.fields.map((f) => {
         const translatedField = { ...f };
-        
+
         if (fieldLabelMap[f.name]) {
           translatedField.label = t(fieldLabelMap[f.name] as any);
         }
-        
+
         if (questionMap[f.name]) {
           const qKey = questionMap[f.name];
           translatedField.label = t(qKey as any);
@@ -91,7 +98,10 @@ export default function SurveyFormPage() {
   const form = useForm<Record<string, unknown>>({
     resolver: zodResolver(zodSchema),
     mode: 'onTouched',
-    defaultValues: {},
+    defaultValues: {
+      email: navState.email || '',
+      respondent_name: navState.name || '',
+    },
   });
 
   const { clearDraft } = useDraft('survey', form);
@@ -120,7 +130,7 @@ export default function SurveyFormPage() {
     setSubmitStatus('loading');
     setSubmitError('');
     try {
-      const res = await submitSurvey(values);
+      const res = await submitSurvey(values, navState.requestNumber);
       if (res.success) {
         clearDraft();
         setSubmitStatus('success');
@@ -130,7 +140,7 @@ export default function SurveyFormPage() {
         setSubmitStatus('error');
       }
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || t('error.submitFailed');
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || t('error.submitFailed');
       setSubmitError(msg);
       setSubmitStatus('error');
       toast({ variant: 'destructive', title: 'Error', description: msg });
@@ -164,6 +174,11 @@ export default function SurveyFormPage() {
             <p className="font-semibold">{t('survey.title')}</p>
             <p className="text-xs text-muted-foreground">{t('survey.version')}</p>
             <p className="text-muted-foreground mt-1">{t('survey.intro')}</p>
+            {navState.requestNumber && (
+              <p className="text-xs text-primary font-medium mt-1">
+                Nomor Permohonan: {navState.requestNumber}
+              </p>
+            )}
           </InfoAlert>
 
           <FormStepper steps={sections.map((s) => s.title)} currentStep={step} />

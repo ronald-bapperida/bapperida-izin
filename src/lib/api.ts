@@ -112,13 +112,19 @@ const SURVEY_FIELD_MAP: Record<string, string> = {
   suggestion: "suggestion",
 };
 
-export async function submitSurvey(values: Record<string, unknown>): Promise<SubmitResponse> {
+export async function submitSurvey(values: Record<string, unknown>, requestNumber?: string): Promise<SubmitResponse> {
   if (USE_MOCK) return mockSubmitSurvey(values);
 
   const mappedValues: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(values)) {
+    if (value === undefined || value === null || value === '') continue;
     const apiKey = SURVEY_FIELD_MAP[key] || key;
     mappedValues[apiKey] = value;
+  }
+
+  // Include requestNumber to link survey to the permit application
+  if (requestNumber) {
+    mappedValues["requestNumber"] = requestNumber;
   }
 
   const { data } = await api.post("/api/surveys", mappedValues);
