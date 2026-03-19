@@ -3,7 +3,7 @@ import type { SubmitResponse } from "@/types/form";
 import { mockSubmitPermit, mockSubmitSurvey, mockSubmitFinalReport, mockCheckPermitStatus } from "./mock-api";
 
 const BASE = import.meta.env.VITE_API_BASE_URL || "";
-const USE_MOCK = !BASE;
+const USE_MOCK = !BASE || BASE.includes("localhost") || BASE.includes("127.0.0.1");
 
 const api = axios.create({ baseURL: BASE });
 
