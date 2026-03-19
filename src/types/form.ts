@@ -9,6 +9,7 @@ export interface FormField {
   placeholder?: string;
   accept?: string[];
   maxSizeMB?: number;
+  allowCamera?: boolean;
   options?: { label: string; value: string }[];
   min?: number;
   max?: number;

@@ -36,7 +36,7 @@ const translations = {
   'permit.note1': { id: 'Surat diproses hari kerja (Senin–Jumat) 08.00–15.00 WIB', en: 'Letters processed on working days (Mon–Fri) 08:00–15:00 WIB' },
   'permit.note2': { id: 'Proses 2–5 hari kerja', en: 'Processing takes 2–5 working days' },
   'permit.note3': { id: 'Surat dikirim via E-mail dan/atau WhatsApp', en: 'Letter sent via Email and/or WhatsApp' },
-  'permit.note4': { id: 'Lampiran format PDF', en: 'Attachments in PDF format' },
+  'permit.note4': { id: 'Lampiran: PDF atau Foto (JPEG/PNG) — maks 10MB per file', en: 'Attachments: PDF or Photo (JPEG/PNG) — max 10MB per file' },
   'permit.note5': { id: 'Identitas pemohon: KTM/KTP', en: 'Applicant ID: Student Card/ID Card' },
   'permit.note6': { id: 'Isi form pakai <strong>HURUF KAPITAL</strong> kecuali email', en: 'Fill form in <strong>CAPITAL LETTERS</strong> except email' },
   'permit.chatWA': { id: 'Chat WA Admin: 0877-2315-5328', en: 'Chat WA Admin: 0877-2315-5328' },
@@ -66,11 +66,10 @@ const translations = {
   'permit.field.signer_position': { id: 'Jabatan yang Menandatangani Surat Pengantar', en: 'Position of Cover Letter Signatory' },
   'permit.field.letter_number': { id: 'Nomor Surat', en: 'Letter Number' },
   'permit.field.letter_date': { id: 'Tanggal Surat', en: 'Letter Date' },
-  'permit.field.identity_pdf': { id: 'Kartu Identitas (KTM/KTP) — PDF', en: 'Identity Card (Student/National ID) — PDF' },
+  'permit.field.identity_pdf': { id: 'Kartu Identitas (KTM/KTP) — Foto/PDF', en: 'Identity Card (Student/National ID) — Photo/PDF' },
   'permit.field.submission_letter_pdf': { id: 'Surat Pengajuan dari Kampus — PDF', en: 'Submission Letter from Campus — PDF' },
   'permit.field.proposal_pdf': { id: 'Proposal Penelitian — PDF', en: 'Research Proposal — PDF' },
-  'permit.field.social_media_proof_pdf': { id: 'Bukti Follow & Like Sosial Media — PDF', en: 'Social Media Follow & Like Proof — PDF' },
-  'permit.field.survey_proof_pdf': { id: 'Bukti Sudah Isi Survei Kepuasan — PDF', en: 'Satisfaction Survey Completion Proof — PDF' },
+  'permit.field.social_media_proof_pdf': { id: 'Bukti Follow & Like Sosial Media — Foto/PDF', en: 'Social Media Follow & Like Proof — Photo/PDF' },
   'permit.field.agree_final_report': { id: 'Saya bersedia menyampaikan laporan akhir ke BAPPERIDA Prov. Kalteng Bidang Riset dan Inovasi.', en: 'I agree to submit the final report to BAPPERIDA Central Kalimantan, Research and Innovation Division.' },
 
   // ===== SURVEY PAGE =====

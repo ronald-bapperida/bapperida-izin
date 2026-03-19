@@ -51,7 +51,6 @@ export default function PermitFormPage() {
       submission_letter_pdf: 'permit.field.submission_letter_pdf',
       proposal_pdf: 'permit.field.proposal_pdf',
       social_media_proof_pdf: 'permit.field.social_media_proof_pdf',
-      survey_proof_pdf: 'permit.field.survey_proof_pdf',
       agree_final_report: 'permit.field.agree_final_report',
     };
 
@@ -104,7 +103,14 @@ export default function PermitFormPage() {
       if (res.success) {
         clearDraft();
         setSubmitStatus('success');
-        navigate('/success?type=permit', { state: { message: res.message, requestNumber: res.requestNumber } });
+        navigate('/success?type=permit', {
+          state: {
+            message: res.message,
+            requestNumber: res.requestNumber,
+            email: values.email_active as string,
+            name: values.full_name as string,
+          },
+        });
       } else {
         setSubmitError(res.message || t('error.generic'));
         setSubmitStatus('error');
@@ -120,7 +126,7 @@ export default function PermitFormPage() {
   const buildSummaryItems = () => {
     const values = form.getValues();
     const items: { label: string; value: string }[] = [];
-    const fileFields = ['identity_pdf', 'submission_letter_pdf', 'proposal_pdf', 'social_media_proof_pdf', 'survey_proof_pdf'];
+    const fileFields = ['identity_pdf', 'submission_letter_pdf', 'proposal_pdf', 'social_media_proof_pdf'];
     const skipFields = ['agree_final_report'];
 
     for (const sec of sections) {

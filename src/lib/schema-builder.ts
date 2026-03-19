@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import type { FormField, FormSchema } from '@/types/form';
 
+const MIME_LABEL: Record<string, string> = {
+  'application/pdf': 'PDF',
+  'image/jpeg': 'JPEG/JPG',
+  'image/png': 'PNG',
+};
+
 function buildFieldSchema(field: FormField): z.ZodTypeAny {
   let schema: z.ZodTypeAny;
 
@@ -28,9 +34,10 @@ function buildFieldSchema(field: FormField): z.ZodTypeAny {
           );
         }
         if (field.accept?.length) {
+          const labels = field.accept.map((m) => MIME_LABEL[m] || m).join(', ');
           schema = (schema as z.ZodType<File>).refine(
             (f) => field.accept!.includes(f.type),
-            { message: `Format file harus: ${field.accept!.join(', ')}` }
+            { message: `Format file harus: ${labels}` }
           );
         }
       } else {

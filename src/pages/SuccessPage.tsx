@@ -1,7 +1,7 @@
-import { useLocation, useSearchParams, Link } from 'react-router-dom';
+import { useLocation, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/AppShell';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Copy, Home, MessageCircle, FileText } from 'lucide-react';
+import { CheckCircle2, Copy, Home, MessageCircle, FileText, ClipboardList } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/lib/i18n';
@@ -16,10 +16,13 @@ import {
 interface SuccessState {
   message?: string;
   requestNumber?: string;
+  email?: string;
+  name?: string;
 }
 
 export default function SuccessPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const type = searchParams.get('type') || '';
   const state = (location.state as SuccessState) || {};
@@ -50,8 +53,15 @@ export default function SuccessPage() {
     ? `Halo Admin BAPPERIDA, saya telah mengirim permohonan izin penelitian dengan nomor ${state.requestNumber}. Mohon bantuannya. Terima kasih.`
     : '';
 
-  const handleCloseModal = () => {
+  const handleGoToSurvey = () => {
     setShowModal(false);
+    navigate('/survei-kepuasan', {
+      state: {
+        requestNumber: state.requestNumber,
+        email: state.email,
+        name: state.name,
+      },
+    });
   };
 
   return (
@@ -83,7 +93,7 @@ export default function SuccessPage() {
         )}
       </div>
 
-      {/* Modal wajib simpan nomor perizinan */}
+      {/* Modal wajib simpan nomor perizinan + isi survei */}
       <AlertDialog open={showModal} onOpenChange={setShowModal}>
         <AlertDialogContent className="max-w-sm mx-auto rounded-xl">
           <AlertDialogHeader>
@@ -92,7 +102,7 @@ export default function SuccessPage() {
               Nomor Permohonan Anda
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs">
-              Simpan nomor ini untuk melacak status permohonan Anda. Anda akan membutuhkannya untuk:
+              Simpan nomor ini untuk melacak status permohonan Anda.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -103,11 +113,11 @@ export default function SuccessPage() {
                 <code className="flex-1 text-sm font-mono font-bold text-foreground tracking-wide break-all bg-white dark:bg-gray-800 p-2 rounded border">
                   {state.requestNumber}
                 </code>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleCopy} 
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
                   className="tap-target shrink-0"
                 >
                   <Copy className="w-4 h-4 mr-1" />
@@ -116,15 +126,10 @@ export default function SuccessPage() {
               </div>
             </div>
 
-            <div className="space-y-2 text-sm">
-              <p className="font-medium">✓ Cek status permohonan</p>
-              <p className="font-medium">✓ Isi survei kepuasan (jika status submitted)</p>
-              <p className="font-medium">✓ Upload laporan akhir (jika status approved)</p>
-            </div>
-
-            <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
-              <p className="text-xs text-foreground">
-                <strong>Penting:</strong> Simpan nomor ini dengan aman. Anda akan membutuhkannya untuk melacak status permohonan.
+            <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 flex items-start gap-2">
+              <ClipboardList className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-800 font-medium">
+                Setelah menyimpan nomor permohonan, Anda <strong>wajib mengisi Survei Kepuasan</strong> sebagai langkah selanjutnya.
               </p>
             </div>
 
@@ -143,16 +148,15 @@ export default function SuccessPage() {
           </div>
 
           <div className="flex gap-2 mt-4">
-            <Link to="/" className="flex-1">
+            <Link to="/" className="flex-1" onClick={() => setShowModal(false)}>
               <Button variant="outline" className="w-full tap-target">
                 {t('common.home')}
               </Button>
             </Link>
-            <Link to="/cek-status" className="flex-1">
-              <Button className="w-full tap-target">
-                Cek Status
-              </Button>
-            </Link>
+            <Button className="flex-1 tap-target gap-1" onClick={handleGoToSurvey}>
+              <ClipboardList className="w-4 h-4" />
+              Isi Survei
+            </Button>
           </div>
         </AlertDialogContent>
       </AlertDialog>

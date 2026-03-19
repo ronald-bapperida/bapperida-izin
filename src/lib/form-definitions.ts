@@ -1,5 +1,8 @@
 import type { FormField, FormSection } from '@/types/form';
 
+const IMAGE_OR_PDF = ['application/pdf', 'image/jpeg', 'image/png'];
+const PDF_ONLY = ['application/pdf'];
+
 // ========== FORM 1: IZIN PENELITIAN ==========
 export const permitSections: FormSection[] = [
   {
@@ -46,11 +49,10 @@ export const permitSections: FormSection[] = [
   {
     title: 'Upload Berkas',
     fields: [
-      { name: 'identity_pdf', label: 'Kartu Identitas (KTM/KTP) — PDF', type: 'file', required: true, accept: ['application/pdf'], maxSizeMB: 1 },
-      { name: 'submission_letter_pdf', label: 'Surat Pengajuan dari Kampus — PDF', type: 'file', required: true, accept: ['application/pdf'], maxSizeMB: 1 },
-      { name: 'proposal_pdf', label: 'Proposal Penelitian — PDF', type: 'file', required: true, accept: ['application/pdf'], maxSizeMB: 1 },
-      { name: 'social_media_proof_pdf', label: 'Bukti Follow & Like Sosial Media — PDF', type: 'file', required: true, accept: ['application/pdf'], maxSizeMB: 1 },
-      { name: 'survey_proof_pdf', label: 'Bukti Sudah Isi Survei Kepuasan — PDF', type: 'file', required: true, accept: ['application/pdf'], maxSizeMB: 1 },
+      { name: 'identity_pdf', label: 'Kartu Identitas (KTM/KTP) — Foto/PDF', type: 'file', required: true, accept: IMAGE_OR_PDF, maxSizeMB: 10, allowCamera: true },
+      { name: 'submission_letter_pdf', label: 'Surat Pengajuan dari Kampus — PDF', type: 'file', required: true, accept: PDF_ONLY, maxSizeMB: 10 },
+      { name: 'proposal_pdf', label: 'Proposal Penelitian — PDF', type: 'file', required: true, accept: PDF_ONLY, maxSizeMB: 10 },
+      { name: 'social_media_proof_pdf', label: 'Bukti Follow & Like Sosial Media — Foto/PDF', type: 'file', required: true, accept: IMAGE_OR_PDF, maxSizeMB: 10, allowCamera: true },
     ],
   },
   {
@@ -219,7 +221,7 @@ export const finalReportSections: FormSection[] = [
   {
     title: 'Upload & Saran',
     fields: [
-      { name: 'final_report_pdf', label: 'Laporan Akhir Penelitian (PDF)', type: 'file', required: true, accept: ['application/pdf'], maxSizeMB: 1 },
+      { name: 'final_report_pdf', label: 'Laporan Akhir Penelitian (PDF)', type: 'file', required: true, accept: ['application/pdf'], maxSizeMB: 10 },
       { name: 'suggestion', label: 'Saran / Masukan', type: 'textarea', required: true, placeholder: 'Tulis saran, masukan, atau harapan Anda...' },
     ],
   },
