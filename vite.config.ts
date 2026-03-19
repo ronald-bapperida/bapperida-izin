@@ -10,6 +10,13 @@ export default defineConfig({
     hmr: {
       overlay: false,
     },
+    proxy: {
+      "/api": {
+        target: "https://core-api.myst-al.my.id",
+        changeOrigin: true,
+        secure: true,
+      },
+    },
   },
   plugins: [react()],
   resolve: {

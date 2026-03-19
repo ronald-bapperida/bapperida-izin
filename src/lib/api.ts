@@ -2,10 +2,12 @@ import axios from "axios";
 import type { SubmitResponse } from "@/types/form";
 import { mockSubmitPermit, mockSubmitSurvey, mockSubmitFinalReport, mockCheckPermitStatus } from "./mock-api";
 
-const BASE = import.meta.env.VITE_API_BASE_URL || "";
-const USE_MOCK = !BASE;
+// USE_MOCK: true when no API URL is configured (falls back to local mock data)
+const USE_MOCK = !import.meta.env.VITE_API_BASE_URL;
 
-const api = axios.create({ baseURL: BASE });
+// Always use relative paths — Vite dev proxy forwards /api/* to the real API,
+// avoiding CORS issues from the browser making cross-origin requests directly.
+const api = axios.create({ baseURL: "" });
 
 // ─── Field name mapping: form UI names → API names ───────────────────────────
 
