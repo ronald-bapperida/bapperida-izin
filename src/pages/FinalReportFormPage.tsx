@@ -43,9 +43,9 @@ export default function FinalReportFormPage() {
 
   const handleConfirmRequestNumber = () => {
     const trimmed = requestNumberInput.trim().toUpperCase();
-    const pattern = /^BAPPERIDA-RID-\d{4}-\d{6}$/;
+    const pattern = /^[A-Z0-9]{8}$/;
     if (!pattern.test(trimmed)) {
-      setRequestNumberError('Format tidak valid. Contoh: BAPPERIDA-RID-2026-000123');
+      setRequestNumberError('Format tidak valid. Masukkan 8 karakter kombinasi huruf (A–Z) dan angka (0–9).');
       return;
     }
     setRequestNumberError('');
@@ -142,16 +142,17 @@ export default function FinalReportFormPage() {
                 Nomor Permohonan <span className="text-destructive">*</span>
               </label>
               <Input
-                placeholder="BAPPERIDA-RID-2026-000123"
+                placeholder="AB12CD34"
                 value={requestNumberInput}
                 onChange={(e) => {
                   setRequestNumberInput(e.target.value.toUpperCase());
                   setRequestNumberError('');
                 }}
                 onKeyDown={(e) => e.key === 'Enter' && handleConfirmRequestNumber()}
-                className="tap-target font-mono text-sm"
+                maxLength={8}
+                className="tap-target font-mono text-sm tracking-widest"
               />
-              <p className="text-xs text-muted-foreground">Format: BAPPERIDA-RID-YYYY-XXXXXX</p>
+              <p className="text-xs text-muted-foreground">8 karakter kombinasi huruf dan angka (contoh: AB12CD34)</p>
               {requestNumberError && (
                 <p className="flex items-center gap-1 text-destructive text-xs" role="alert">
                   <AlertCircle className="w-3 h-3 shrink-0" />

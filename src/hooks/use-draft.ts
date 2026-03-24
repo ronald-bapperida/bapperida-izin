@@ -3,6 +3,16 @@ import type { UseFormReturn } from 'react-hook-form';
 
 const DRAFT_PREFIX = 'draft:';
 
+/** Clears every draft entry across all forms */
+export function clearAllDrafts() {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(DRAFT_PREFIX)) keysToRemove.push(key);
+  }
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
+}
+
 export function useDraft(key: string, form: UseFormReturn<Record<string, unknown>>) {
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const storageKey = `${DRAFT_PREFIX}${key}`;
@@ -41,8 +51,9 @@ export function useDraft(key: string, form: UseFormReturn<Record<string, unknown
   }, [save]);
 
   const clearDraft = useCallback(() => {
-    localStorage.removeItem(storageKey);
-  }, [storageKey]);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    clearAllDrafts();
+  }, []);
 
   return { clearDraft };
 }

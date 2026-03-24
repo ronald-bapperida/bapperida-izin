@@ -92,9 +92,9 @@ export default function CheckStatusPage() {
     const trimmed = requestNumber.trim().toUpperCase();
     if (!trimmed) return;
 
-    const pattern = /^BAPPERIDA-RID-\d{4}-\d{6}$/;
+    const pattern = /^[A-Z0-9]{8}$/;
     if (!pattern.test(trimmed)) {
-      setError(t('status.invalidFormat'));
+      setError('Format token tidak valid. Masukkan 8 karakter kombinasi huruf (A–Z) dan angka (0–9).');
       setResult(null);
       return;
     }
@@ -188,13 +188,14 @@ export default function CheckStatusPage() {
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">{t('status.inputLabel')}</label>
             <Input
-              placeholder="BAPPERIDA-RID-2026-000123"
+              placeholder="AB12CD34"
               value={requestNumber}
               onChange={(e) => setRequestNumber(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="tap-target text-sm font-mono"
+              maxLength={8}
+              className="tap-target text-sm font-mono tracking-widest"
             />
-            <p className="text-xs text-muted-foreground">{t('status.formatHint')}</p>
+            <p className="text-xs text-muted-foreground">8 karakter kombinasi huruf dan angka (contoh: AB12CD34)</p>
           </div>
 
           <Button
