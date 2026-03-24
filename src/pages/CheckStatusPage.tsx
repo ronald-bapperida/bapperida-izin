@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useI18n } from '@/lib/i18n';
 import { checkPermitStatus } from '@/lib/api';
-import { Search, Loader2, FileDown, AlertTriangle, CheckCircle2, Clock, XCircle, FileText, Edit, Send } from 'lucide-react';
+import {
+  Search, Loader2, FileDown, AlertTriangle, CheckCircle2,
+  Clock, XCircle, FileText, Edit, Send, Eye,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface PermitResult {
@@ -21,6 +24,60 @@ interface PermitResult {
   fileUrl?: string;
   createdAt?: string;
 }
+
+type StatusKey = 'submitted' | 'in_review' | 'revision_requested' | 'approved' | 'generated_letter' | 'sent' | 'rejected';
+
+const STATUS_CONFIG: Record<StatusKey, { icon: any; color: string; bg: string; label: string; message?: string }> = {
+  submitted: {
+    icon: Clock,
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
+    label: 'Terkirim',
+    message: 'Permohonan Anda telah terkirim dan menunggu diproses.',
+  },
+  in_review: {
+    icon: Eye,
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+    label: 'Sedang Direview',
+    message: 'Mohon ditunggu, permohonan Anda sedang dalam proses review oleh tim BAPPERIDA.',
+  },
+  revision_requested: {
+    icon: AlertTriangle,
+    color: 'text-orange-600',
+    bg: 'bg-orange-50',
+    label: 'Perlu Revisi',
+    message: 'Permohonan Anda memerlukan revisi. Silakan periksa catatan revisi di bawah.',
+  },
+  approved: {
+    icon: CheckCircle2,
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+    label: 'Disetujui',
+    message: 'Permohonan Anda telah disetujui. Silakan upload laporan akhir penelitian.',
+  },
+  generated_letter: {
+    icon: CheckCircle2,
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+    label: 'Surat Dibuat',
+    message: 'Surat izin penelitian Anda telah dibuat dan siap diunduh.',
+  },
+  sent: {
+    icon: CheckCircle2,
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+    label: 'Surat Telah Dikirim',
+    message: 'Surat izin penelitian Anda telah dikirim. Silakan unduh surat di bawah.',
+  },
+  rejected: {
+    icon: XCircle,
+    color: 'text-destructive',
+    bg: 'bg-destructive/5',
+    label: 'Ditolak',
+    message: 'Permohonan Anda ditolak. Silakan periksa alasan penolakan di bawah.',
+  },
+};
 
 export default function CheckStatusPage() {
   const navigate = useNavigate();
@@ -52,7 +109,7 @@ export default function CheckStatusPage() {
     } catch (err: any) {
       const msg = err?.response?.status === 404
         ? t('status.notFound')
-        : err?.response?.data?.error || t('error.generic');
+        : err?.response?.data?.error || err?.response?.data?.message || t('error.generic');
       setError(msg);
       toast({ variant: 'destructive', title: 'Error', description: msg });
     } finally {
@@ -60,109 +117,62 @@ export default function CheckStatusPage() {
     }
   };
 
-  const handleAction = () => {
-    if (!result) return;
+  const status = (result?.status?.toLowerCase() || '') as StatusKey;
+  const statusConfig = status && STATUS_CONFIG[status] ? STATUS_CONFIG[status] : null;
 
-    switch (result.status) {
-      case 'submitted':
-        // Isi survei kepuasan
-        navigate('/survei-kepuasan', { 
-          state: { 
-            requestNumber: result.requestNumber,
-            email: result.email,
-            name: result.fullName 
-          } 
-        });
-        break;
-      case 'approved':
-        // Upload laporan akhir
-        navigate('/laporan-akhir', { 
-          state: { 
-            requestNumber: result.requestNumber,
-            email: result.email,
-            name: result.fullName,
-            researchTitle: result.researchTitle
-          } 
-        });
-        break;
-      case 'revision_requested':
-        // Revisi permohonan
-        navigate('/izin-penelitian/revisi', { 
-          state: { 
-            requestNumber: result.requestNumber,
-            reviewNote: result.review_note || result.reviewNote
-          } 
-        });
-        break;
-      default:
-        // Tidak ada action
-        break;
-    }
-  };
-
-  const status = result?.status?.toLowerCase() || '';
   const isSubmitted = status === 'submitted';
   const isApproved = status === 'approved';
   const isRevisionRequested = status === 'revision_requested';
   const isSentOrGenerated = status === 'sent' || status === 'generated_letter';
   const isRejected = status === 'rejected';
   const reviewNote = result?.review_note || result?.reviewNote || '';
-
-  const getStatusConfig = () => {
-    if (isSentOrGenerated) return { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', label: t('status.sent') };
-    if (isRejected) return { icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/5', label: t('status.rejected') };
-    if (isApproved) return { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', label: 'Disetujui' };
-    if (isRevisionRequested) return { icon: AlertTriangle, color: 'text-yellow-600', bg: 'bg-yellow-50', label: 'Perlu Revisi' };
-    if (isSubmitted) return { icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', label: 'Submitted' };
-    return { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', label: t('status.processing') };
-  };
-
-  const statusConfig = result ? getStatusConfig() : null;
-
   const fileUrl = result?.generatedLetter?.fileUrl || result?.fileUrl;
+
+  const handleAction = () => {
+    if (!result) return;
+    if (isSubmitted) {
+      navigate('/survei-kepuasan', {
+        state: { requestNumber: result.requestNumber, email: result.email, name: result.fullName },
+      });
+    } else if (isApproved) {
+      navigate('/laporan-akhir', {
+        state: {
+          requestNumber: result.requestNumber,
+          email: result.email,
+          name: result.fullName,
+          researchTitle: result.researchTitle,
+        },
+      });
+    } else if (isRevisionRequested) {
+      navigate('/izin-penelitian/revisi', {
+        state: { requestNumber: result.requestNumber, reviewNote: result.review_note || result.reviewNote },
+      });
+    }
+  };
 
   const getActionButton = () => {
     if (!result) return null;
-
     if (isSubmitted) {
       return (
-        <Button 
-          onClick={handleAction} 
-          className="w-full tap-target gap-2"
-          size="lg"
-        >
-          <Edit className="w-5 h-5" />
-          Isi Survei Kepuasan
+        <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
+          <Edit className="w-5 h-5" /> Isi Survei Kepuasan
         </Button>
       );
     }
-
     if (isApproved) {
       return (
-        <Button 
-          onClick={handleAction} 
-          className="w-full tap-target gap-2"
-          size="lg"
-        >
-          <Send className="w-5 h-5" />
-          Upload Laporan Akhir
+        <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
+          <Send className="w-5 h-5" /> Upload Laporan Akhir
         </Button>
       );
     }
-
     if (isRevisionRequested) {
       return (
-        <Button 
-          onClick={handleAction} 
-          className="w-full tap-target gap-2"
-          size="lg"
-        >
-          <Edit className="w-5 h-5" />
-          Revisi Permohonan
+        <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
+          <Edit className="w-5 h-5" /> Revisi Permohonan
         </Button>
       );
     }
-
     return null;
   };
 
@@ -213,6 +223,13 @@ export default function CheckStatusPage() {
               <span className={`font-semibold text-sm ${statusConfig.color}`}>{statusConfig.label}</span>
             </div>
 
+            {/* Status message */}
+            {statusConfig.message && (
+              <div className="px-4 pt-3">
+                <p className="text-sm text-muted-foreground">{statusConfig.message}</p>
+              </div>
+            )}
+
             {/* Details */}
             <div className="p-4 space-y-3">
               <InfoRow label={t('status.requestNumberLabel')} value={result.requestNumber} mono />
@@ -237,13 +254,13 @@ export default function CheckStatusPage() {
 
               {/* Revision requested: show review note */}
               {isRevisionRequested && reviewNote && (
-                <div className="rounded-lg border border-yellow-600/20 bg-yellow-50 p-3 space-y-1">
-                  <p className="text-xs font-semibold text-yellow-600">Catatan Revisi:</p>
+                <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 space-y-1">
+                  <p className="text-xs font-semibold text-orange-600">Catatan Revisi:</p>
                   <p className="text-sm text-foreground">{reviewNote}</p>
                 </div>
               )}
 
-              {/* Sent/Generated: show download + office notice */}
+              {/* Sent/Generated: PDF download + stamp notice */}
               {isSentOrGenerated && (
                 <div className="space-y-3 pt-1">
                   {fileUrl && (
@@ -260,7 +277,6 @@ export default function CheckStatusPage() {
                       </div>
                     </a>
                   )}
-
                   <div className="rounded-lg bg-warning/10 border border-warning/20 p-3 flex items-start gap-2">
                     <FileText className="w-4 h-4 text-warning shrink-0 mt-0.5" />
                     <p className="text-xs text-foreground font-medium">{t('status.officeStamp')}</p>

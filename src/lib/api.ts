@@ -35,7 +35,6 @@ const PERMIT_FILE_MAP: Record<string, string> = {
   submission_letter_pdf: "fileIntroLetter",
   proposal_pdf: "fileProposal",
   social_media_proof_pdf: "fileSocialMedia",
-  survey_proof_pdf: "fileSurvey",
 };
 
 const FINAL_REPORT_FIELD_MAP: Record<string, string> = {
@@ -43,6 +42,7 @@ const FINAL_REPORT_FIELD_MAP: Record<string, string> = {
   name: "name",
   research_title: "researchTitle",
   suggestion: "suggestion",
+  request_number: "requestNumber",
 };
 
 const FINAL_REPORT_FILE_MAP: Record<string, string> = {
@@ -84,7 +84,6 @@ export async function submitPermit(values: Record<string, unknown>): Promise<Sub
     headers: { "Content-Type": "multipart/form-data" },
   });
 
-  // Normalize API response to our SubmitResponse shape
   return {
     success: true,
     message: data.message || "Berhasil dikirim",
@@ -95,7 +94,7 @@ export async function submitPermit(values: Record<string, unknown>): Promise<Sub
 // ─── Submit: Survey ──────────────────────────────────────────────────────────
 const SURVEY_FIELD_MAP: Record<string, string> = {
   email: "email",
-  respondent_name: "respondentName", // mapping ke camelCase database
+  respondent_name: "respondentName",
   age: "age",
   gender: "gender",
   education: "education",
@@ -122,7 +121,6 @@ export async function submitSurvey(values: Record<string, unknown>, requestNumbe
     mappedValues[apiKey] = value;
   }
 
-  // Include requestNumber to link survey to the permit application
   if (requestNumber) {
     mappedValues["requestNumber"] = requestNumber;
   }
@@ -136,13 +134,19 @@ export async function submitSurvey(values: Record<string, unknown>, requestNumbe
 
 // ─── Submit: Final Report + Suggestion ───────────────────────────────────────
 
-export async function submitFinalReport(values: Record<string, unknown>): Promise<SubmitResponse> {
+export async function submitFinalReport(values: Record<string, unknown>, requestNumber?: string): Promise<SubmitResponse> {
   if (USE_MOCK) {
     const fd = buildMappedFormData(values, FINAL_REPORT_FIELD_MAP, FINAL_REPORT_FILE_MAP);
     return mockSubmitFinalReport(fd);
   }
 
-  const fd = buildMappedFormData(values, FINAL_REPORT_FIELD_MAP, FINAL_REPORT_FILE_MAP);
+  // Inject requestNumber into values so it gets included in FormData
+  const enriched = { ...values };
+  if (requestNumber) {
+    enriched.request_number = requestNumber;
+  }
+
+  const fd = buildMappedFormData(enriched, FINAL_REPORT_FIELD_MAP, FINAL_REPORT_FILE_MAP);
   const { data } = await api.post("/api/final-reports", fd, {
     headers: { "Content-Type": "multipart/form-data" },
   });

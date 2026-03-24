@@ -20,6 +20,30 @@ interface SuccessState {
   name?: string;
 }
 
+function copyToClipboard(text: string): Promise<void> {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+  // Fallback for non-secure contexts (e.g. iframe)
+  return new Promise((resolve, reject) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      resolve();
+    } catch {
+      reject(new Error('Copy failed'));
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  });
+}
+
 export default function SuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -40,7 +64,7 @@ export default function SuccessPage() {
   const handleCopy = async () => {
     if (!state.requestNumber) return;
     try {
-      await navigator.clipboard.writeText(state.requestNumber);
+      await copyToClipboard(state.requestNumber);
       setCopied(true);
       toast({ title: t('common.copied'), description: t('success.copySuccess') });
       setTimeout(() => setCopied(false), 2000);
@@ -56,11 +80,7 @@ export default function SuccessPage() {
   const handleGoToSurvey = () => {
     setShowModal(false);
     navigate('/survei-kepuasan', {
-      state: {
-        requestNumber: state.requestNumber,
-        email: state.email,
-        name: state.name,
-      },
+      state: { requestNumber: state.requestNumber, email: state.email, name: state.name },
     });
   };
 
@@ -93,7 +113,7 @@ export default function SuccessPage() {
         )}
       </div>
 
-      {/* Modal wajib simpan nomor perizinan + isi survei */}
+      {/* Modal: save request number + go to survey */}
       <AlertDialog open={showModal} onOpenChange={setShowModal}>
         <AlertDialogContent className="max-w-sm mx-auto rounded-xl">
           <AlertDialogHeader>

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/AppShell';
-import { FileSearch, BarChart3, FileText, ChevronRight, ClipboardList } from 'lucide-react';
+import { FileSearch, FileText, ClipboardList, ChevronRight } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
 const Index = () => {
@@ -15,20 +15,13 @@ const Index = () => {
       path: '/izin-penelitian',
       color: 'bg-primary/10 text-primary',
     },
-    // {
-    //   title: t('index.survey.title'),
-    //   description: t('index.survey.desc'),
-    //   icon: BarChart3,
-    //   path: '/survei-kepuasan',
-    //   color: 'bg-accent/10 text-accent',
-    // },
-    // {
-    //   title: t('index.final.title'),
-    //   description: t('index.final.desc'),
-    //   icon: FileText,
-    //   path: '/laporan-akhir',
-    //   color: 'bg-warning/10 text-warning',
-    // },
+    {
+      title: t('index.final.title'),
+      description: t('index.final.desc'),
+      icon: FileText,
+      path: '/laporan-akhir',
+      color: 'bg-warning/10 text-warning',
+    },
     {
       title: t('index.status.title'),
       description: t('index.status.desc'),

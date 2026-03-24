@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AppShell } from '@/components/AppShell';
@@ -11,17 +11,48 @@ import { useDraft } from '@/hooks/use-draft';
 import { buildZodSchema } from '@/lib/schema-builder';
 import { submitFinalReport } from '@/lib/api';
 import { finalReportSections } from '@/lib/form-definitions';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/lib/i18n';
+import { Search, AlertCircle } from 'lucide-react';
 import type { FormSection } from '@/types/form';
+
+interface FinalNavState {
+  requestNumber?: string;
+  email?: string;
+  name?: string;
+  researchTitle?: string;
+}
 
 export default function FinalReportFormPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = (location.state as FinalNavState) || {};
   const { toast } = useToast();
   const { t, lang } = useI18n();
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState('');
 
+  // ── Request number gate (only shown when arriving from the homepage directly) ──
+  const [requestNumberInput, setRequestNumberInput] = useState('');
+  const [requestNumberError, setRequestNumberError] = useState('');
+  const [confirmedRequestNumber, setConfirmedRequestNumber] = useState<string | null>(
+    navState.requestNumber || null,
+  );
+
+  const handleConfirmRequestNumber = () => {
+    const trimmed = requestNumberInput.trim().toUpperCase();
+    const pattern = /^BAPPERIDA-RID-\d{4}-\d{6}$/;
+    if (!pattern.test(trimmed)) {
+      setRequestNumberError('Format tidak valid. Contoh: BAPPERIDA-RID-2026-000123');
+      return;
+    }
+    setRequestNumberError('');
+    setConfirmedRequestNumber(trimmed);
+  };
+
+  // ── Translated sections ──────────────────────────────────────────────────────
   const sections: FormSection[] = useMemo(() => {
     const sectionKeys = ['final.section.reporter', 'final.section.upload'] as const;
     const fieldMap: Record<string, string> = {
@@ -46,7 +77,11 @@ export default function FinalReportFormPage() {
   const form = useForm<Record<string, unknown>>({
     resolver: zodResolver(zodSchema),
     mode: 'onTouched',
-    defaultValues: {},
+    defaultValues: {
+      email: navState.email || '',
+      name: navState.name || '',
+      research_title: navState.researchTitle || '',
+    },
   });
 
   const { clearDraft } = useDraft('final', form);
@@ -55,7 +90,7 @@ export default function FinalReportFormPage() {
     setSubmitStatus('loading');
     setSubmitError('');
     try {
-      const res = await submitFinalReport(values);
+      const res = await submitFinalReport(values, confirmedRequestNumber || undefined);
       if (res.success) {
         clearDraft();
         setSubmitStatus('success');
@@ -65,7 +100,7 @@ export default function FinalReportFormPage() {
         setSubmitStatus('error');
       }
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || t('error.submitFailed');
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || t('error.submitFailed');
       setSubmitError(msg);
       setSubmitStatus('error');
       toast({ variant: 'destructive', title: 'Error', description: msg });
@@ -81,6 +116,66 @@ export default function FinalReportFormPage() {
     }
   };
 
+  // ── Gate: ask for request number first ──────────────────────────────────────
+  if (!confirmedRequestNumber) {
+    return (
+      <AppShell title={t('final.appShellTitle')}>
+        <div className="space-y-5 animate-fade-in">
+          <div className="text-center space-y-1 pt-2">
+            <h1 className="text-lg font-bold text-foreground">Laporan Akhir Penelitian</h1>
+            <p className="text-sm text-muted-foreground">
+              Masukkan nomor permohonan izin penelitian Anda untuk melanjutkan.
+            </p>
+          </div>
+
+          <InfoAlert>
+            <p className="font-semibold">Nomor Permohonan Diperlukan</p>
+            <p className="text-muted-foreground text-sm mt-1">
+              Pastikan permohonan Anda sudah berstatus <strong>Disetujui</strong> sebelum mengirim laporan akhir.
+              Nomor permohonan ada di email/WhatsApp yang Anda terima.
+            </p>
+          </InfoAlert>
+
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">
+                Nomor Permohonan <span className="text-destructive">*</span>
+              </label>
+              <Input
+                placeholder="BAPPERIDA-RID-2026-000123"
+                value={requestNumberInput}
+                onChange={(e) => {
+                  setRequestNumberInput(e.target.value.toUpperCase());
+                  setRequestNumberError('');
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && handleConfirmRequestNumber()}
+                className="tap-target font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">Format: BAPPERIDA-RID-YYYY-XXXXXX</p>
+              {requestNumberError && (
+                <p className="flex items-center gap-1 text-destructive text-xs" role="alert">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  {requestNumberError}
+                </p>
+              )}
+            </div>
+
+            <Button
+              onClick={handleConfirmRequestNumber}
+              disabled={!requestNumberInput.trim()}
+              className="w-full tap-target gap-2 font-semibold"
+              size="lg"
+            >
+              <Search className="w-5 h-5" />
+              Lanjutkan
+            </Button>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
+  // ── Main form ────────────────────────────────────────────────────────────────
   return (
     <AppShell title={t('final.appShellTitle')}>
       <FormProvider {...form}>
@@ -88,9 +183,9 @@ export default function FinalReportFormPage() {
           <InfoAlert>
             <p className="font-semibold">{t('final.title')}</p>
             <p className="text-muted-foreground mt-1">{t('final.desc')}</p>
-            {lang === 'id' && (
-              <p className="text-xs text-muted-foreground italic mt-1">{t('final.descEn')}</p>
-            )}
+            <p className="text-xs text-primary font-medium mt-1">
+              Nomor Permohonan: {confirmedRequestNumber}
+            </p>
           </InfoAlert>
 
           {sections.map((section, i) => (
@@ -99,7 +194,10 @@ export default function FinalReportFormPage() {
                 <div key={field.name}>
                   <FormFieldRenderer field={field} />
                   {field.name === 'final_report_pdf' && (
-                    <p className="text-xs text-muted-foreground mt-1" dangerouslySetInnerHTML={{ __html: t('final.field.fileHelper') }} />
+                    <p
+                      className="text-xs text-muted-foreground mt-1"
+                      dangerouslySetInnerHTML={{ __html: t('final.field.fileHelper') }}
+                    />
                   )}
                 </div>
               ))}
