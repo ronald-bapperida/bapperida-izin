@@ -7,7 +7,7 @@ const USE_MOCK = !import.meta.env.VITE_API_BASE_URL;
 
 // Always use relative paths — Vite dev proxy forwards /api/* to the real API,
 // avoiding CORS issues from the browser making cross-origin requests directly.
-const api = axios.create({ baseURL: "" });
+const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL });
 
 // ─── Field name mapping: form UI names → API names ───────────────────────────
 
