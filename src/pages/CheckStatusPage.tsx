@@ -155,15 +155,27 @@ export default function CheckStatusPage() {
     if (isSubmitted) {
       return (
         <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
-          <Edit className="w-5 h-5" /> Isi Survei Kepuasan
+          <Edit className="w-5 h-5" /> Isi Survei IKM
         </Button>
       );
     }
     if (isApproved) {
       return (
-        <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
-          <Send className="w-5 h-5" /> Upload Laporan Akhir
-        </Button>
+        <div className="space-y-2">
+          <Button
+            onClick={() => navigate('/survei-kepuasan', {
+              state: { requestNumber: result.requestNumber, email: result.email, name: result.fullName },
+            })}
+            variant="outline"
+            className="w-full tap-target gap-2"
+            size="lg"
+          >
+            <Edit className="w-5 h-5" /> Isi Survei IKM
+          </Button>
+          <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
+            <Send className="w-5 h-5" /> Upload Laporan Akhir
+          </Button>
+        </div>
       );
     }
     if (isRevisionRequested) {

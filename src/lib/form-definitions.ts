@@ -34,7 +34,7 @@ export const permitSections: FormSection[] = [
     title: 'Detail Penelitian',
     fields: [
       { name: 'research_location', label: 'LOKASI PENELITIAN SPESIFIK', type: 'textarea', required: true, uppercase: true, placeholder: 'DINAS PENDIDIKAN KOTA PALANGKA RAYA' },
-      { name: 'research_duration', label: 'DURASI PENELITIAN', type: 'textarea', required: true, uppercase: true, placeholder: '3 BULAN (MAX) MULAI JANUARI - MARET 2026' },
+      { name: 'research_duration', label: 'DURASI PENELITIAN', type: 'textarea', required: true, uppercase: true, helperText: 'Contoh: 3 BULAN (MAKS.) MULAI JANUARI – MARET 2026', placeholder: '' },
       { name: 'research_title', label: 'JUDUL PENELITIAN', type: 'textarea', required: true, uppercase: true, placeholder: 'ANALISIS PENGARUH ...' },
     ],
   },

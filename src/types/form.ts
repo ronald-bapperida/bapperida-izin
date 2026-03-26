@@ -7,6 +7,7 @@ export interface FormField {
   required?: boolean;
   uppercase?: boolean;
   placeholder?: string;
+  helperText?: string;
   accept?: string[];
   maxSizeMB?: number;
   allowCamera?: boolean;

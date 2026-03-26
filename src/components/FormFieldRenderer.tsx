@@ -116,6 +116,11 @@ export function FormFieldRenderer({ field }: Props) {
     return (
       <div className="space-y-1.5">
         {baseLabel}
+        {field.helperText && (
+          <p className="text-xs text-muted-foreground bg-muted/60 rounded-md px-3 py-2 border border-border/50">
+            {field.helperText}
+          </p>
+        )}
         <Textarea
           id={field.name}
           placeholder={field.placeholder}
@@ -132,6 +137,11 @@ export function FormFieldRenderer({ field }: Props) {
   return (
     <div className="space-y-1.5">
       {baseLabel}
+      {field.helperText && (
+        <p className="text-xs text-muted-foreground bg-muted/60 rounded-md px-3 py-2 border border-border/50">
+          {field.helperText}
+        </p>
+      )}
       <Input
         id={field.name}
         type={inputType}
