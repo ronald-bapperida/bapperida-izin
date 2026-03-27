@@ -16,18 +16,18 @@ const Index = () => {
       color: 'bg-primary/10 text-primary',
     },
     {
-      title: t('index.final.title'),
-      description: t('index.final.desc'),
-      icon: FileText,
-      path: '/laporan-akhir',
-      color: 'bg-warning/10 text-warning',
-    },
-    {
       title: t('index.status.title'),
       description: t('index.status.desc'),
       icon: ClipboardList,
       path: '/cek-status',
       color: 'bg-secondary/80 text-secondary-foreground',
+    },
+    {
+      title: t('index.final.title'),
+      description: t('index.final.desc'),
+      icon: FileText,
+      path: '/laporan-akhir',
+      color: 'bg-warning/10 text-warning',
     },
   ];
 
