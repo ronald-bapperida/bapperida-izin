@@ -33,14 +33,14 @@ const STATUS_CONFIG: Record<StatusKey, { icon: any; color: string; bg: string; l
     color: 'text-blue-600',
     bg: 'bg-blue-50',
     label: 'Terkirim',
-    message: 'Permohonan Anda telah terkirim dan menunggu diproses.',
+    message: 'Permohonan Anda telah terkirim dan menunggu diproses. Isi Survei jika merasa belum mengisi survei.',
   },
   in_review: {
     icon: Eye,
     color: 'text-yellow-600',
     bg: 'bg-yellow-50',
     label: 'Sedang Direview',
-    message: 'Mohon ditunggu, permohonan Anda sedang dalam proses review oleh tim BAPPERIDA.',
+    message: 'Mohon ditunggu, permohonan Anda sedang dalam proses review oleh tim BAPPERIDA. Isi Survei jika merasa belum mengisi survei.',
   },
   revision_requested: {
     icon: AlertTriangle,
@@ -54,7 +54,7 @@ const STATUS_CONFIG: Record<StatusKey, { icon: any; color: string; bg: string; l
     color: 'text-green-600',
     bg: 'bg-green-50',
     label: 'Disetujui',
-    message: 'Permohonan Anda telah disetujui. Silakan upload laporan akhir penelitian.',
+    message: 'Permohonan Anda telah disetujui. Silakan menunggu kurang lebih 3-5 hari kerja untuk dibuatkan surat. Isi Survei jika merasa belum mengisi survei.',
   },
   generated_letter: {
     icon: CheckCircle2,
@@ -105,6 +105,7 @@ export default function CheckStatusPage() {
 
     try {
       const data = await checkPermitStatus(trimmed);
+      console.log(data);
       setResult(data);
     } catch (err: any) {
       const msg = err?.response?.status === 404
@@ -172,9 +173,9 @@ export default function CheckStatusPage() {
           >
             <Edit className="w-5 h-5" /> Isi Survei IKM
           </Button>
-          <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
+          {/* <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
             <Send className="w-5 h-5" /> Upload Laporan Akhir
-          </Button>
+          </Button> */}
         </div>
       );
     }
