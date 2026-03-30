@@ -23,6 +23,7 @@ interface PermitResult {
   generatedLetter?: { fileUrl?: string; letterNumber?: string } | null;
   fileUrl?: string;
   createdAt?: string;
+  is_survei?: boolean;
 }
 
 type StatusKey = 'submitted' | 'in_review' | 'revision_requested' | 'approved' | 'generated_letter' | 'sent' | 'rejected';
@@ -122,29 +123,38 @@ export default function CheckStatusPage() {
   const statusConfig = status && STATUS_CONFIG[status] ? STATUS_CONFIG[status] : null;
 
   const isSubmitted = status === 'submitted';
+  const isInReview = status === 'in_review';
   const isApproved = status === 'approved';
   const isRevisionRequested = status === 'revision_requested';
   const isSentOrGenerated = status === 'sent' || status === 'generated_letter';
+  const isSent = status === 'sent';
   const isRejected = status === 'rejected';
   const reviewNote = result?.review_note || result?.reviewNote || '';
   const fileUrl = result?.generatedLetter?.fileUrl || result?.fileUrl;
+  const isSurveyDone = result?.is_survei === true;
+
+  const navigateToSurvey = () => {
+    if (!result) return;
+    navigate('/survei-kepuasan', {
+      state: { requestNumber: result.requestNumber, email: result.email, name: result.fullName },
+    });
+  };
+
+  const navigateToFinalReport = () => {
+    if (!result) return;
+    navigate('/laporan-akhir', {
+      state: {
+        requestNumber: result.requestNumber,
+        email: result.email,
+        name: result.fullName,
+        researchTitle: result.researchTitle,
+      },
+    });
+  };
 
   const handleAction = () => {
     if (!result) return;
-    if (isSubmitted) {
-      navigate('/survei-kepuasan', {
-        state: { requestNumber: result.requestNumber, email: result.email, name: result.fullName },
-      });
-    } else if (isApproved) {
-      navigate('/laporan-akhir', {
-        state: {
-          requestNumber: result.requestNumber,
-          email: result.email,
-          name: result.fullName,
-          researchTitle: result.researchTitle,
-        },
-      });
-    } else if (isRevisionRequested) {
+    if (isRevisionRequested) {
       navigate('/izin-penelitian/revisi', {
         state: { requestNumber: result.requestNumber, reviewNote: result.review_note || result.reviewNote },
       });
@@ -153,32 +163,9 @@ export default function CheckStatusPage() {
 
   const getActionButton = () => {
     if (!result) return null;
-    if (isSubmitted) {
-      return (
-        <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
-          <Edit className="w-5 h-5" /> Isi Survei IKM
-        </Button>
-      );
-    }
-    if (isApproved) {
-      return (
-        <div className="space-y-2">
-          <Button
-            onClick={() => navigate('/survei-kepuasan', {
-              state: { requestNumber: result.requestNumber, email: result.email, name: result.fullName },
-            })}
-            variant="outline"
-            className="w-full tap-target gap-2"
-            size="lg"
-          >
-            <Edit className="w-5 h-5" /> Isi Survei IKM
-          </Button>
-          {/* <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
-            <Send className="w-5 h-5" /> Upload Laporan Akhir
-          </Button> */}
-        </div>
-      );
-    }
+
+    const showSurveyButton = !isSurveyDone && (isSubmitted || isInReview || isApproved);
+
     if (isRevisionRequested) {
       return (
         <Button onClick={handleAction} className="w-full tap-target gap-2" size="lg">
@@ -186,6 +173,35 @@ export default function CheckStatusPage() {
         </Button>
       );
     }
+
+    if (isSent) {
+      return (
+        <div className="space-y-2">
+          {showSurveyButton && (
+            <Button
+              onClick={navigateToSurvey}
+              variant="outline"
+              className="w-full tap-target gap-2"
+              size="lg"
+            >
+              <Edit className="w-5 h-5" /> Isi Survei IKM
+            </Button>
+          )}
+          <Button onClick={navigateToFinalReport} className="w-full tap-target gap-2" size="lg">
+            <Send className="w-5 h-5" /> Upload Laporan Akhir
+          </Button>
+        </div>
+      );
+    }
+
+    if (showSurveyButton) {
+      return (
+        <Button onClick={navigateToSurvey} className="w-full tap-target gap-2" size="lg">
+          <Edit className="w-5 h-5" /> Isi Survei IKM
+        </Button>
+      );
+    }
+
     return null;
   };
 

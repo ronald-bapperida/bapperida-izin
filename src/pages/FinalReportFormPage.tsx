@@ -9,13 +9,13 @@ import { StickySubmitBar } from '@/components/StickySubmitBar';
 import { InfoAlert } from '@/components/InfoAlert';
 import { useDraft } from '@/hooks/use-draft';
 import { buildZodSchema } from '@/lib/schema-builder';
-import { submitFinalReport } from '@/lib/api';
+import { submitFinalReport, checkPermitStatus } from '@/lib/api';
 import { finalReportSections } from '@/lib/form-definitions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/lib/i18n';
-import { Search, AlertCircle } from 'lucide-react';
+import { Search, AlertCircle, Loader2 } from 'lucide-react';
 import type { FormSection } from '@/types/form';
 
 interface FinalNavState {
@@ -37,11 +37,12 @@ export default function FinalReportFormPage() {
   // ── Request number gate (only shown when arriving from the homepage directly) ──
   const [requestNumberInput, setRequestNumberInput] = useState('');
   const [requestNumberError, setRequestNumberError] = useState('');
+  const [gateLoading, setGateLoading] = useState(false);
   const [confirmedRequestNumber, setConfirmedRequestNumber] = useState<string | null>(
     navState.requestNumber || null,
   );
 
-  const handleConfirmRequestNumber = () => {
+  const handleConfirmRequestNumber = async () => {
     const trimmed = requestNumberInput.trim().toUpperCase();
     const pattern = /^[A-Z0-9]{8}$/;
     if (!pattern.test(trimmed)) {
@@ -49,7 +50,32 @@ export default function FinalReportFormPage() {
       return;
     }
     setRequestNumberError('');
-    setConfirmedRequestNumber(trimmed);
+    setGateLoading(true);
+    try {
+      const permit = await checkPermitStatus(trimmed);
+      const permitStatus = permit?.status?.toLowerCase();
+      if (permitStatus !== 'sent') {
+        const statusMessages: Record<string, string> = {
+          submitted: 'Permohonan Anda masih dalam status Terkirim. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
+          in_review: 'Permohonan Anda sedang dalam proses review. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
+          revision_requested: 'Permohonan Anda memerlukan revisi. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
+          approved: 'Permohonan Anda telah disetujui namun surat belum dikirim. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
+          generated_letter: 'Surat izin sedang disiapkan. Laporan akhir hanya dapat dikirim setelah surat izin dikirim.',
+          rejected: 'Permohonan Anda ditolak. Laporan akhir tidak dapat dikirim.',
+        };
+        const msg = statusMessages[permitStatus] || 'Status permohonan Anda belum memenuhi syarat untuk mengirim laporan akhir. Pastikan surat izin sudah diterbitkan dan dikirim.';
+        setRequestNumberError(msg);
+        return;
+      }
+      setConfirmedRequestNumber(trimmed);
+    } catch (err: any) {
+      const msg = err?.response?.status === 404
+        ? 'Nomor permohonan tidak ditemukan. Periksa kembali nomor yang Anda masukkan.'
+        : err?.response?.data?.error || err?.response?.data?.message || 'Terjadi kesalahan. Coba lagi.';
+      setRequestNumberError(msg);
+    } finally {
+      setGateLoading(false);
+    }
   };
 
   // ── Translated sections ──────────────────────────────────────────────────────
@@ -131,7 +157,7 @@ export default function FinalReportFormPage() {
           <InfoAlert>
             <p className="font-semibold">Nomor Permohonan Diperlukan</p>
             <p className="text-muted-foreground text-sm mt-1">
-              Pastikan permohonan Anda sudah berstatus <strong>Disetujui</strong> sebelum mengirim laporan akhir.
+              Laporan akhir hanya dapat dikirim jika surat izin penelitian Anda sudah <strong>diterbitkan dan dikirim</strong>.
               Nomor permohonan ada di email/WhatsApp yang Anda terima.
             </p>
           </InfoAlert>
@@ -163,12 +189,12 @@ export default function FinalReportFormPage() {
 
             <Button
               onClick={handleConfirmRequestNumber}
-              disabled={!requestNumberInput.trim()}
+              disabled={!requestNumberInput.trim() || gateLoading}
               className="w-full tap-target gap-2 font-semibold"
               size="lg"
             >
-              <Search className="w-5 h-5" />
-              Lanjutkan
+              {gateLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+              {gateLoading ? 'Memeriksa...' : 'Lanjutkan'}
             </Button>
           </div>
         </div>
