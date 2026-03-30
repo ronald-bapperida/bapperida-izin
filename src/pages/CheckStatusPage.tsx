@@ -23,7 +23,7 @@ interface PermitResult {
   generatedLetter?: { fileUrl?: string; letterNumber?: string } | null;
   fileUrl?: string;
   createdAt?: string;
-  is_survei?: boolean;
+  isSurvei?: boolean;
 }
 
 type StatusKey = 'submitted' | 'in_review' | 'revision_requested' | 'approved' | 'generated_letter' | 'sent' | 'rejected';
@@ -131,7 +131,7 @@ export default function CheckStatusPage() {
   const isRejected = status === 'rejected';
   const reviewNote = result?.review_note || result?.reviewNote || '';
   const fileUrl = result?.generatedLetter?.fileUrl || result?.fileUrl;
-  const isSurveyDone = result?.is_survei === true;
+  const isSurveyDone = result?.isSurvei === true;
 
   const navigateToSurvey = () => {
     if (!result) return;
