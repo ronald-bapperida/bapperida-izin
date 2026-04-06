@@ -54,20 +54,26 @@ export default function FinalReportFormPage() {
     try {
       const permit = await checkPermitStatus(trimmed);
       const permitStatus = permit?.status?.toLowerCase();
-      if (permitStatus !== 'sent') {
+      
+      // 🔥 Perbaikan: Izinkan status 'approved' ATAU 'generated_letter' ATAU 'sent'
+      const allowedStatuses = ['approved', 'generated_letter', 'sent'];
+      const isAllowed = allowedStatuses.includes(permitStatus);
+      
+      if (!isAllowed) {
         const statusMessages: Record<string, string> = {
           submitted: 'Permohonan Anda masih dalam status Terkirim. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
           in_review: 'Permohonan Anda sedang dalam proses review. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
           revision_requested: 'Permohonan Anda memerlukan revisi. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
-          approved: 'Permohonan Anda telah disetujui namun surat belum dikirim. Laporan akhir hanya dapat dikirim setelah surat izin diterbitkan dan dikirim.',
-          generated_letter: 'Surat izin sedang disiapkan. Laporan akhir hanya dapat dikirim setelah surat izin dikirim.',
           rejected: 'Permohonan Anda ditolak. Laporan akhir tidak dapat dikirim.',
         };
         const msg = statusMessages[permitStatus] || 'Status permohonan Anda belum memenuhi syarat untuk mengirim laporan akhir. Pastikan surat izin sudah diterbitkan dan dikirim.';
         setRequestNumberError(msg);
         return;
       }
+      
+      // Status approved/generated_letter/sent -> lanjut ke form
       setConfirmedRequestNumber(trimmed);
+      
     } catch (err: any) {
       const msg = err?.response?.status === 404
         ? 'Nomor permohonan tidak ditemukan. Periksa kembali nomor yang Anda masukkan.'

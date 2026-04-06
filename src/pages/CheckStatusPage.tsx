@@ -20,8 +20,7 @@ interface PermitResult {
   status: string;
   review_note?: string;
   reviewNote?: string;
-  generatedLetter?: { fileUrl?: string; letterNumber?: string } | null;
-  fileUrl?: string;
+  fileUrl?: string;  // Ini akan berisi pdfFileUrl dari generatedLetter
   createdAt?: string;
   isSurvei?: boolean;
 }
@@ -34,14 +33,14 @@ const STATUS_CONFIG: Record<StatusKey, { icon: any; color: string; bg: string; l
     color: 'text-blue-600',
     bg: 'bg-blue-50',
     label: 'Terkirim',
-    message: 'Permohonan Anda telah terkirim dan menunggu diproses. Isi Survei jika merasa belum mengisi survei.',
+    message: 'Permohonan Anda telah terkirim dan menunggu diproses.',
   },
   in_review: {
     icon: Eye,
     color: 'text-yellow-600',
     bg: 'bg-yellow-50',
     label: 'Sedang Direview',
-    message: 'Mohon ditunggu, permohonan Anda sedang dalam proses review oleh tim BAPPERIDA. Isi Survei jika merasa belum mengisi survei.',
+    message: 'Mohon ditunggu, permohonan Anda sedang dalam proses review oleh tim BAPPERIDA.',
   },
   revision_requested: {
     icon: AlertTriangle,
@@ -55,14 +54,14 @@ const STATUS_CONFIG: Record<StatusKey, { icon: any; color: string; bg: string; l
     color: 'text-green-600',
     bg: 'bg-green-50',
     label: 'Disetujui',
-    message: 'Permohonan Anda telah disetujui. Silakan menunggu kurang lebih 3-5 hari kerja untuk dibuatkan surat. Isi Survei jika merasa belum mengisi survei.',
+    message: 'Permohonan Anda telah disetujui. Silakan menunggu kurang lebih 3-5 hari kerja untuk dibuatkan surat.',
   },
   generated_letter: {
     icon: CheckCircle2,
     color: 'text-green-600',
     bg: 'bg-green-50',
     label: 'Surat Dibuat',
-    message: 'Surat izin penelitian Anda telah dibuat dan siap diunduh.',
+    message: 'Surat izin penelitian Anda telah dibuat.',
   },
   sent: {
     icon: CheckCircle2,
@@ -106,7 +105,7 @@ export default function CheckStatusPage() {
 
     try {
       const data = await checkPermitStatus(trimmed);
-      console.log(data);
+      console.log('API Response:', data);
       setResult(data);
     } catch (err: any) {
       const msg = err?.response?.status === 404
@@ -130,7 +129,8 @@ export default function CheckStatusPage() {
   const isSent = status === 'sent';
   const isRejected = status === 'rejected';
   const reviewNote = result?.review_note || result?.reviewNote || '';
-  const fileUrl = result?.generatedLetter?.fileUrl || result?.fileUrl;
+  // 🔥 Gunakan fileUrl dari response (sudah berisi pdfFileUrl)
+  const fileUrl = result?.fileUrl;
   const isSurveyDone = result?.isSurvei === true;
 
   const navigateToSurvey = () => {
@@ -164,6 +164,7 @@ export default function CheckStatusPage() {
   const getActionButton = () => {
     if (!result) return null;
 
+    // Survey button hanya untuk status yang membutuhkan survei (submitted, in_review, approved)
     const showSurveyButton = !isSurveyDone && (isSubmitted || isInReview || isApproved);
 
     if (isRevisionRequested) {
@@ -290,10 +291,10 @@ export default function CheckStatusPage() {
                 </div>
               )}
 
-              {/* Sent/Generated: PDF download + stamp notice */}
+              {/* Sent/Generated: PDF download */}
               {isSentOrGenerated && (
                 <div className="space-y-3 pt-1">
-                  {fileUrl && (
+                  {fileUrl ? (
                     <a
                       href={fileUrl}
                       target="_blank"
@@ -306,6 +307,13 @@ export default function CheckStatusPage() {
                         <p className="text-xs text-muted-foreground truncate">{t('status.downloadHint')}</p>
                       </div>
                     </a>
+                  ) : (
+                    <div className="rounded-lg bg-muted/30 p-3 flex items-start gap-2">
+                      <Clock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                      <p className="text-xs text-muted-foreground">
+                        Surat sedang diproses. Silakan cek kembali nanti.
+                      </p>
+                    </div>
                   )}
                   <div className="rounded-lg bg-warning/10 border border-warning/20 p-3 flex items-start gap-2">
                     <FileText className="w-4 h-4 text-warning shrink-0 mt-0.5" />
