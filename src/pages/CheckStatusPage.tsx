@@ -79,6 +79,14 @@ const STATUS_CONFIG: Record<StatusKey, { icon: any; color: string; bg: string; l
   },
 };
 
+const getFullFileUrl = (url: string | undefined) => {
+  if (!url) return null;
+  // Jika sudah absolute URL, langsung return
+  if (url.startsWith('http')) return url;
+  // Jika relative, tambahkan base URL
+  return `https://dashboard.myst-al.my.id${url}`;
+};
+
 export default function CheckStatusPage() {
   const navigate = useNavigate();
   const { t } = useI18n();
@@ -296,7 +304,7 @@ export default function CheckStatusPage() {
                 <div className="space-y-3 pt-1">
                   {fileUrl ? (
                     <a
-                      href={fileUrl}
+                      href={getFullFileUrl(fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3 hover:bg-primary/10 transition-colors"
