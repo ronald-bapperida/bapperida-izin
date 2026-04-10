@@ -23,6 +23,7 @@ interface PermitResult {
   fileUrl?: string;  // Ini akan berisi pdfFileUrl dari generatedLetter
   createdAt?: string;
   isSurvei?: boolean;
+  isSendData?: boolean;
 }
 
 type StatusKey = 'submitted' | 'in_review' | 'revision_requested' | 'approved' | 'generated_letter' | 'sent' | 'rejected';
@@ -140,6 +141,7 @@ export default function CheckStatusPage() {
   // 🔥 Gunakan fileUrl dari response (sudah berisi pdfFileUrl)
   const fileUrl = result?.fileUrl;
   const isSurveyDone = result?.isSurvei === true;
+  const isData = result?.isSendData;
 
   const navigateToSurvey = () => {
     if (!result) return;
@@ -302,7 +304,7 @@ export default function CheckStatusPage() {
               {/* Sent/Generated: PDF download */}
               {isSentOrGenerated && (
                 <div className="space-y-3 pt-1">
-                  {fileUrl ? (
+                  {fileUrl && isData ? (
                     <a
                       href={getFullFileUrl(fileUrl)}
                       target="_blank"
@@ -319,7 +321,7 @@ export default function CheckStatusPage() {
                     <div className="rounded-lg bg-muted/30 p-3 flex items-start gap-2">
                       <Clock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                       <p className="text-xs text-muted-foreground">
-                        Surat sedang diproses. Silakan cek kembali nanti.
+                        {reviewNote}.
                       </p>
                     </div>
                   )}

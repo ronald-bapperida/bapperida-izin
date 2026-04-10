@@ -117,7 +117,7 @@ export function FormFieldRenderer({ field }: Props) {
       <div className="space-y-1.5">
         {baseLabel}
         {field.helperText && (
-          <p className="text-xs text-muted-foreground bg-muted/60 rounded-md px-3 py-2 border border-border/50">
+          <p className="text-xs text-muted-foreground bg-muted/60 rounded-md px-3 py-2 border border-border/50 whitespace-pre-line">
             {field.helperText}
           </p>
         )}
@@ -138,7 +138,7 @@ export function FormFieldRenderer({ field }: Props) {
     <div className="space-y-1.5">
       {baseLabel}
       {field.helperText && (
-        <p className="text-xs text-muted-foreground bg-muted/60 rounded-md px-3 py-2 border border-border/50">
+        <p className="text-xs text-muted-foreground bg-muted/60 rounded-md px-3 py-2 border border-border/50 whitespace-pre-line">
           {field.helperText}
         </p>
       )}

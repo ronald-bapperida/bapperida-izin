@@ -5,12 +5,12 @@ const PDF_ONLY = ['application/pdf'];
 
 // ========== FORM 1: IZIN PENELITIAN ==========
 export const permitSections: FormSection[] = [
-  {
-    title: 'Data Akun',
-    fields: [
-      { name: 'email_google', label: 'Email Google', type: 'email', required: true, uppercase: false, placeholder: 'email@gmail.com' },
-    ],
-  },
+  // {
+  //   title: 'Data Akun',
+  //   fields: [
+  //     { name: 'email_google', label: 'Email Google', type: 'email', required: true, uppercase: false, placeholder: 'email@gmail.com' },
+  //   ],
+  // },
   {
     title: 'Data Pemohon',
     fields: [
@@ -34,7 +34,7 @@ export const permitSections: FormSection[] = [
     title: 'Detail Penelitian',
     fields: [
       { name: 'research_location', label: 'LOKASI PENELITIAN SPESIFIK', type: 'textarea', required: true, uppercase: true, placeholder: 'DINAS PENDIDIKAN KOTA PALANGKA RAYA' },
-      { name: 'research_duration', label: 'DURASI PENELITIAN', type: 'textarea', required: true, uppercase: true, helperText: 'Contoh: 3 BULAN (MAKS.) MULAI JANUARI – MARET 2026', placeholder: '' },
+      { name: 'research_duration', label: 'DURASI PENELITIAN', type: 'textarea', required: true, uppercase: true, helperText: 'Contoh: \n - 3 BULAN (MAX) (Sesuai PerGub No.12 Tahun 2015) \n-1 Januari 2026 - 1 Maret 2026', placeholder: '' },
       { name: 'research_title', label: 'JUDUL PENELITIAN', type: 'textarea', required: true, uppercase: true, placeholder: 'ANALISIS PENGARUH ...' },
     ],
   },

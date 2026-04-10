@@ -30,9 +30,9 @@ export default function PermitFormPage() {
 
   // Translate sections
   const sections: FormSection[] = useMemo(() => {
-    const sectionKeys = ['permit.section.account', 'permit.section.applicant', 'permit.section.research', 'permit.section.letter', 'permit.section.upload', 'permit.section.statement'] as const;
+    const sectionKeys = ['permit.section.applicant', 'permit.section.research', 'permit.section.letter', 'permit.section.upload', 'permit.section.statement'] as const;
     const fieldKeyMap: Record<string, string> = {
-      email_google: 'permit.field.email_google',
+      email_google: 'permit.field.email_active',
       full_name: 'permit.field.full_name',
       email_active: 'permit.field.email_active',
       nim_nik: 'permit.field.nim_nik',
@@ -180,7 +180,7 @@ export default function PermitFormPage() {
             </ul>
             <div className="mt-2">
               <a
-                href="https://wa.me/6208772315328"
+                href="https://wa.me/628772315328"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
