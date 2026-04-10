@@ -155,7 +155,7 @@ export default function SuccessPage() {
 
             {state.requestNumber && (
               <a
-                href={`https://wa.me/6208772315328?text=${encodeURIComponent(waMessage)}`}
+                href={`https://wa.me/6287723155328?text=${encodeURIComponent(waMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block"

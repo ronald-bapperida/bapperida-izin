@@ -180,7 +180,7 @@ export default function PermitFormPage() {
             </ul>
             <div className="mt-2">
               <a
-                href="https://wa.me/628772315328"
+                href="https://wa.me/6287723155328"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
