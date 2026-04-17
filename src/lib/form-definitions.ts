@@ -33,16 +33,16 @@ export const permitSections: FormSection[] = [
   {
     title: 'Detail Penelitian',
     fields: [
-      { name: 'research_location', label: 'LOKASI PENELITIAN SPESIFIK', type: 'textarea', required: true, uppercase: true, placeholder: 'DINAS PENDIDIKAN KOTA PALANGKA RAYA' },
-      { name: 'research_duration', label: 'DURASI PENELITIAN', type: 'textarea', required: true, uppercase: true, helperText: 'Contoh: \n - 3 BULAN (MAX) (Sesuai PerGub No.12 Tahun 2015) \n-1 Januari 2026 - 1 Maret 2026', placeholder: '' },
-      { name: 'research_title', label: 'JUDUL PENELITIAN', type: 'textarea', required: true, uppercase: true, placeholder: 'ANALISIS PENGARUH ...' },
+      { name: 'research_location', label: 'LOKASI PENELITIAN SPESIFIK', type: 'textarea', required: true, uppercase: false, placeholder: 'DINAS PENDIDIKAN KOTA PALANGKA RAYA' },
+      { name: 'research_duration', label: 'DURASI PENELITIAN', type: 'textarea', required: true, uppercase: false, helperText: 'Contoh: \n - 3 BULAN (MAX) (Sesuai PerGub No.12 Tahun 2015) \n-1 Januari 2026 - 1 Maret 2026', placeholder: '' },
+      { name: 'research_title', label: 'JUDUL PENELITIAN', type: 'textarea', required: true, uppercase: false, placeholder: 'ANALISIS PENGARUH ...' },
     ],
   },
   {
     title: 'Surat Pengantar',
     fields: [
-      { name: 'signer_position', label: 'Jabatan yang Menandatangani Surat Pengantar', type: 'text', required: true, uppercase: true, placeholder: 'DEKAN FAKULTAS ...' },
-      { name: 'letter_number', label: 'Nomor Surat', type: 'text', required: true, uppercase: true, placeholder: '001/UN24/FK/2026' },
+      { name: 'signer_position', label: 'Jabatan yang Menandatangani Surat Pengantar', type: 'text', required: true, uppercase: false, placeholder: 'DEKAN FAKULTAS ...' },
+      { name: 'letter_number', label: 'Nomor Surat', type: 'text', required: true, uppercase: false, placeholder: '001/UN24/FK/2026' },
       { name: 'letter_date', label: 'Tanggal Surat', type: 'date', required: true },
     ],
   },

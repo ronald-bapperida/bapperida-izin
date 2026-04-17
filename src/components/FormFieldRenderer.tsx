@@ -124,8 +124,12 @@ export function FormFieldRenderer({ field }: Props) {
         <Textarea
           id={field.name}
           placeholder={field.placeholder}
-          className="min-h-[100px]"
-          {...register(field.name)}
+          className={`min-h-[100px] ${field.uppercase ? 'uppercase' : ''}`}
+          {...register(field.name, {
+            setValueAs: field.uppercase
+              ? (value: string) => value?.toUpperCase()
+              : undefined,
+          })}
         />
         {errorEl}
       </div>
